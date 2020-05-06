@@ -1,18 +1,20 @@
-package com.example.interventionroom
+package com.example.ivroom
 
 import android.content.ContentValues
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Parcelable
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.room.Room
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.time.LocalDate
+import java.io.Serializable
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), Communicator {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,35 +45,40 @@ class MainActivity : AppCompatActivity() {
 
 
         //
-        GlobalScope.launch {
-            //db.plombierDao().insertAll(plomList)
-            val plom = db.plombierDao().getAll()
 
-            plom?.forEach {
+        GlobalScope.launch {
+            db.plombierDao().insertAll(plomList)
+            val plom = db.plombierDao().getAll()
+            println("liste des plombiers")
+            plom.forEach {
+
                 println(it.nom.plus(it.prenom))
             }
         }
+
             GlobalScope.launch {
 
-                //db.typeDao().insertAll(tyList)
+                db.typeDao().insertAll(tyList)
                 val ty = db.typeDao().getAll()
-
-                ty?.forEach {
+                println("liste des types")
+                ty.forEach {
                     println(it.intitulé)
                 }
             }
+
+
         GlobalScope.launch{
-            //db.interventionDao().insertAll(interList)
+            db.interventionDao().insertAll(interList)
             val iv = db.interventionDao().getAll()
-            iv?.forEach{
-                val type= db.typeDao().getById(it.type)
-                println(type)
+            println("liste des interventions")
+            iv.forEach{
+                println(it.date + it.id + it.type + it.plombier)
             }
 
         }
 
         /*val plomb=Plombier(1,"Lagrid","Houssem")
-        db.plombierDao().insert(plomb)*/
+        db.plombierDao().insert(plomb)
         val manipule=Intervention(10, "2020-5-26",3,4)
 
         addBtn.setOnClickListener {
@@ -134,8 +141,44 @@ class MainActivity : AppCompatActivity() {
 
             }
 
-        }
+        }*/
+        val frag = ConsulterFragment()
+        supportFragmentManager.beginTransaction().replace(R.id.mainAct,frag).commit()
+    }
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun passListIv(date: String) {
+        val db = AppDataBase(this)
 
+        val bundle1 = Bundle()
+        val listIv: Serializable
+        if(date==""){
+            Log.d(ContentValues.TAG,"dakhallll pass List Iv")
+            listIv= db.interventionDao().getAll() as ArrayList<Parcelable>
+        }
+        else{
+            listIv= db.interventionDao().getAllByDate(date) as ArrayList<Parcelable>
+
+        }
+        bundle1.putParcelableArrayList("ListInter",listIv)
+        //bundle1.putSerializable("ListInter",listIv)
+        val transaction = this.supportFragmentManager.beginTransaction()
+        val frag = InterventionList()
+        frag.arguments = bundle1
+        transaction.replace(R.id.mainAct, frag)
+        transaction.addToBackStack(null)
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+        transaction.commit()}
+
+    override fun passInterv(inter: Intervention, frag: Fragment) {
+        /*val bundle1 = Bundle()
+        bundle1.putSerializable("Intervention",inter)
+        val transaction = this.supportFragmentManager.beginTransaction()
+        //val frag = InterventionDetailsFrag()
+        frag.arguments = bundle1
+        transaction.replace(R.id.mainAct, frag)
+        transaction.addToBackStack(null)
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+        transaction.commit()*/
     }
 
 }

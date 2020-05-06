@@ -1,9 +1,10 @@
-package com.example.interventionroom
+package com.example.ivroom
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.ivroom.*
 
 @Database(entities = [Intervention::class, Plombier::class, Type::class], version = 1)
 abstract class AppDataBase: RoomDatabase(){

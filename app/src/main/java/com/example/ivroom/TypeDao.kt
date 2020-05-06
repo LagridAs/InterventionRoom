@@ -1,22 +1,23 @@
-package com.example.interventionroom
+package com.example.ivroom
 
 import androidx.room.*
+import com.example.ivroom.Type
 
 @Dao
 interface TypeDao {
     @Query("SELECT * FROM typeTab")
     fun getAll(): List<Type>
 
-    @Query("SELECT * FROM typeTab WHERE id= :id_ty")
+    @Query("SELECT * FROM typeTab WHERE id= :id_ty LIMIT 1")
     fun getById(id_ty:Int): Type
 
-    @Query("SELECT * FROM typeTab WHERE intitule_type LIKE :intitule")
-    fun getByIntitule(intitule:String): List<Type>
+    @Query("SELECT * FROM typeTab WHERE intitule_type LIKE :intitule LIMIT 1")
+    fun getByIntitule(intitule:String): Type
 
     @Insert
     fun insertAll(tyList:List<Type>)
     @Insert
-    fun insert(ty:Type)
+    fun insert(ty: Type)
 
     @Delete
     fun delete(type: Type)

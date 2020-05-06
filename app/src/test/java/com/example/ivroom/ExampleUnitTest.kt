@@ -1,4 +1,4 @@
-package com.example.interventionroom
+package com.example.ivroom
 
 import org.junit.Test
 
